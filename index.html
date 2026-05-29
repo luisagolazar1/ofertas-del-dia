@@ -668,7 +668,7 @@ function addProvider() {
   renderProvidersList();
 }
 
-// ─── AUTO UPDATE (Gemini) ───
+// ─── AUTO UPDATE (Gemini - sin búsqueda web, tier gratuito) ───
 async function startAutoUpdate() {
   const key = getApiKey();
   if(!key) { openSettings(); alert('Primero configurá tu Gemini API Key en ⚙️ Configuración.\n\n¡Es gratis en aistudio.google.com!'); return; }
@@ -683,30 +683,29 @@ async function startAutoUpdate() {
   const activeProviders = providers.filter(p=>provToggle[p]!==false);
   const today = new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-  const prompt = `Hoy es ${today}. Buscá en la web las promociones y descuentos vigentes de los siguientes bancos y billeteras en Argentina: ${activeProviders.join(', ')}.
+  const prompt = `Hoy es ${today}. Basándote en tu conocimiento de promociones bancarias y de billeteras digitales en Argentina, generá una lista de descuentos y reintegros típicos y vigentes para estos proveedores: ${activeProviders.join(', ')}.
 
-Devolvé ÚNICAMENTE un array JSON válido, sin texto previo ni posterior, sin bloques de código markdown, con objetos que tengan EXACTAMENTE estas propiedades:
+IMPORTANTE: Devolvé ÚNICAMENTE un array JSON válido, sin texto previo ni posterior, sin bloques de código markdown. Cada objeto debe tener EXACTAMENTE estas propiedades:
 - "provider": nombre del banco/billetera (string)
-- "cat": categoría exacta, una de: Supermercados, Combustible, Gastronomía, Farmacia, Indumentaria, Electrónica, Entretenimiento, Viajes (string)
-- "desc": descripción corta de la promoción (string, máx 100 chars)
-- "pct": porcentaje de reintegro o descuento (número entero)
-- "cap": tope máximo de reintegro en pesos argentinos (número entero, 0 si no hay tope claro)
-- "minPurchase": compra mínima en pesos argentinos (número entero, 0 si no hay mínimo)
-- "days": días que aplica la promo, en español (string, ej: "Martes", "Lunes y Miércoles", "Todos los días")
-- "exp": fecha estimada de vencimiento en formato YYYY-MM-DD
+- "cat": una de exactamente: Supermercados, Combustible, Gastronomía, Farmacia, Indumentaria, Electrónica, Entretenimiento, Viajes (string)
+- "desc": descripción corta de la promo (string, máx 100 chars)
+- "pct": porcentaje de reintegro (número entero entre 1 y 50)
+- "cap": tope máximo en pesos argentinos (número entero)
+- "minPurchase": compra mínima en pesos (número entero, 0 si no hay)
+- "days": días que aplica en español (string, ej: "Martes", "Lunes y Miércoles", "Todos los días")
+- "exp": fecha de vencimiento estimada en formato YYYY-MM-DD (dentro de los próximos 3 meses)
 
-Solo incluí promos con datos concretos encontrados. Si no encontrás info de un proveedor, no lo incluyas.`;
+Generá al menos 2 promos por proveedor si conocés sus promociones habituales. Si no tenés info de un proveedor, no lo incluyas.`;
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          tools: [{ google_search: {} }],
-          generationConfig: { temperature: 0.2 }
+          generationConfig: { temperature: 0.3, maxOutputTokens: 3000 }
         })
       }
     );
@@ -817,7 +816,7 @@ Respondé en español argentino, sé honesto sobre las limitaciones (los datos s
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
       {
         method:'POST',
         headers:{'Content-Type':'application/json'},
