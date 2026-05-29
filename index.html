@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Ofertas del Día 🏷️</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0f; --surface:#13131a; --card:#1a1a25; --border:#2a2a3a;
+  --text:#f0f0f8; --muted:#7070a0; --accent:#00e5a0; --accent3:#7c6af7;
+  --accent4:#f7c948; --warn:#ff6b35; --danger:#ff4d4d;
+  --radius:16px; --px:20px;
+}
+@media(min-width:600px){ :root{ --px:32px; } }
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:90px;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 70% 40% at 85% 5%,rgba(0,229,160,.07) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 60% at 5% 90%,rgba(124,106,247,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0;}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+/* ─── HEADER ─── */
+header{position:sticky;top:0;z-index:50;background:rgba(10,10,15,.85);backdrop-filter:blur(16px);
+  padding:14px var(--px);display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.logo-row{display:flex;align-items:center;gap:9px;}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent3));
+  display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-.03em;white-space:nowrap;}
+h1 span{color:var(--accent);}
+.header-actions{display:flex;align-items:center;gap:7px;}
+.btn-icon-header{width:36px;height:36px;border-radius:10px;background:var(--surface);
+  border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.9rem;
+  display:grid;place-items:center;transition:all .15s;flex-shrink:0;}
+.btn-icon-header:hover{color:var(--text);border-color:var(--border);}
+.btn-ai-header{background:linear-gradient(135deg,var(--accent3),#a06af7);border:none;color:#fff;}
+.btn-ai-header:hover{opacity:.85;}
+.date-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:5px 11px;font-size:.72rem;color:var(--muted);white-space:nowrap;display:none;}
+.date-pill strong{color:var(--text);}
+@media(min-width:480px){.date-pill{display:flex;align-items:center;gap:5px;}}
+
+/* ─── STATS ─── */
+.stats{display:flex;gap:8px;padding:14px var(--px) 0;overflow-x:auto;scrollbar-width:none;}
+.stats::-webkit-scrollbar{display:none;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:11px 14px;display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.stat-icon{font-size:1.2rem;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;line-height:1;}
+.stat-label{font-size:.65rem;color:var(--muted);margin-top:2px;white-space:nowrap;}
+
+/* ─── DAY BAR ─── */
+.section-bar{padding:12px var(--px) 0;display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none;}
+.section-bar::-webkit-scrollbar{display:none;}
+.bar-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0;margin-right:2px;}
+.day-chip{background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  padding:7px 12px;font-size:.77rem;cursor:pointer;transition:all .18s;color:var(--muted);
+  user-select:none;font-weight:500;flex-shrink:0;white-space:nowrap;}
+.day-chip:hover{border-color:var(--accent4);color:var(--accent4);}
+.day-chip.active{background:var(--accent4);border-color:var(--accent4);color:#000;font-weight:700;}
+.day-chip.today-hl{border-color:var(--accent);color:var(--accent);}
+.day-chip.today-hl.active{background:var(--accent);border-color:var(--accent);color:#000;}
+
+/* ─── CAT FILTER ─── */
+.cat-bar{padding:8px var(--px) 0;display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none;}
+.cat-bar::-webkit-scrollbar{display:none;}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:5px 13px;font-size:.76rem;cursor:pointer;transition:all .15s;color:var(--muted);
+  user-select:none;flex-shrink:0;white-space:nowrap;}
+.chip:hover,.chip.active{border-color:var(--accent);color:var(--accent);}
+.chip.active{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600;}
+.chip[data-cat="Supermercados"].active{border-color:#00e5a0;color:#00e5a0;background:color-mix(in srgb,#00e5a0 12%,transparent);}
+.chip[data-cat="Combustible"].active{border-color:#ff6b35;color:#ff6b35;background:color-mix(in srgb,#ff6b35 12%,transparent);}
+.chip[data-cat="Gastronomía"].active{border-color:#f7c948;color:#f7c948;background:color-mix(in srgb,#f7c948 12%,transparent);}
+.chip[data-cat="Farmacia"].active{border-color:#3ecfff;color:#3ecfff;background:color-mix(in srgb,#3ecfff 12%,transparent);}
+.chip[data-cat="Indumentaria"].active{border-color:#e05fff;color:#e05fff;background:color-mix(in srgb,#e05fff 12%,transparent);}
+.chip[data-cat="Electrónica"].active{border-color:#7c6af7;color:#7c6af7;background:color-mix(in srgb,#7c6af7 12%,transparent);}
+.chip[data-cat="Entretenimiento"].active{border-color:#ff4d88;color:#ff4d88;background:color-mix(in srgb,#ff4d88 12%,transparent);}
+.chip[data-cat="Viajes"].active{border-color:#48d9a4;color:#48d9a4;background:color-mix(in srgb,#48d9a4 12%,transparent);}
+
+/* ─── GRID ─── */
+.grid{padding:14px var(--px) 0;display:grid;gap:12px;
+  grid-template-columns:1fr;}
+@media(min-width:540px){.grid{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:1200px){.grid{grid-template-columns:repeat(4,1fr);}}
+
+/* ─── OFFER CARD ─── */
+.offer-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;display:flex;flex-direction:column;gap:11px;
+  transition:transform .18s,box-shadow .18s;animation:fadeUp .25s ease both;
+  position:relative;overflow:hidden;}
+.offer-card:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(0,0,0,.4);}
+.offer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--cc,var(--accent));border-radius:var(--radius) var(--radius) 0 0;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
+.cat-pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;
+  font-size:.68rem;font-weight:600;background:color-mix(in srgb,var(--cc,var(--accent)) 15%,transparent);
+  color:var(--cc,var(--accent));border:1px solid color-mix(in srgb,var(--cc,var(--accent)) 30%,transparent);
+  white-space:nowrap;}
+.card-actions{display:flex;gap:5px;flex-shrink:0;}
+.btn-card{width:28px;height:28px;border-radius:8px;background:var(--surface);
+  border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:.75rem;
+  display:grid;place-items:center;transition:all .15s;}
+.btn-card:hover{color:var(--text);border-color:var(--muted);}
+.btn-card.del:hover{color:var(--danger);border-color:var(--danger);}
+.btn-card.ai-ask:hover{color:var(--accent3);border-color:var(--accent3);}
+.card-provider{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;line-height:1.2;}
+.card-desc{font-size:.77rem;color:var(--muted);line-height:1.45;}
+.card-metrics{display:flex;gap:7px;}
+.metric{flex:1;background:var(--surface);border-radius:10px;padding:9px 8px;text-align:center;}
+.metric-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;
+  color:var(--cc,var(--accent));line-height:1;}
+.metric-val.sm{font-size:.82rem;color:var(--muted);}
+.metric-lbl{font-size:.6rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
+.card-footer{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;}
+.validity{font-size:.68rem;color:var(--muted);display:flex;align-items:center;gap:4px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.expired .dot{background:var(--danger);}
+.soon .dot{background:var(--accent4);animation:blink 1s infinite;}
+.card-tags{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.tag{font-size:.64rem;background:var(--surface);border-radius:5px;padding:2px 7px;color:var(--muted);white-space:nowrap;}
+.today-badge{font-size:.64rem;background:color-mix(in srgb,var(--accent4) 15%,transparent);
+  color:var(--accent4);border:1px solid color-mix(in srgb,var(--accent4) 30%,transparent);
+  border-radius:5px;padding:2px 7px;white-space:nowrap;}
+
+/* ─── EMPTY ─── */
+.empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-icon{font-size:2.5rem;margin-bottom:10px;}
+.empty p{font-size:.87rem;line-height:1.6;}
+
+/* ─── FAB ─── */
+.fab-group{position:fixed;bottom:20px;right:20px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.fab{height:52px;border-radius:26px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:8px;padding:0 20px;
+  box-shadow:0 6px 24px rgba(0,0,0,.5);transition:transform .18s,opacity .18s;}
+.fab:hover{transform:scale(1.04);}
+.fab-add{background:var(--accent);color:#000;}
+.fab-update{background:linear-gradient(135deg,var(--accent3),#5a4fcf);color:#fff;font-size:.8rem;padding:0 16px;}
+.fab-update:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.fab-update .spin{display:inline-block;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── MODALS BASE ─── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;
+  display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+@media(min-width:600px){.overlay{align-items:center;}}
+.overlay.open{display:flex;}
+.sheet{background:var(--card);width:100%;border-radius:20px 20px 0 0;max-height:92vh;
+  overflow-y:auto;animation:slideUp .25s ease;}
+@media(min-width:600px){
+  .sheet{border-radius:20px;max-width:500px;animation:fadeUp .2s ease;}
+}
+.sheet-inner{padding:24px;}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;display:block;}
+@media(min-width:600px){.sheet-handle{display:none;}}
+.sheet h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:18px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg.full{grid-column:1/-1;}
+label{font-size:.72rem;color:var(--muted);}
+input,select,textarea{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;color:var(--text);font-size:.85rem;font-family:'DM Sans',sans-serif;
+  outline:none;transition:border-color .15s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+select option{background:var(--card);}
+textarea{resize:vertical;min-height:65px;}
+.btn-row{display:flex;gap:9px;margin-top:18px;}
+.btn-secondary{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  border-radius:11px;padding:11px;cursor:pointer;font-size:.84rem;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.btn-secondary:hover{color:var(--text);}
+.btn-primary{flex:2;background:var(--accent);color:#000;font-weight:700;border:none;
+  border-radius:11px;padding:11px;cursor:pointer;font-size:.84rem;font-family:'DM Sans',sans-serif;transition:opacity .15s;}
+.btn-primary:hover{opacity:.85;}
+.btn-primary.purple{background:linear-gradient(135deg,var(--accent3),#5a4fcf);color:#fff;}
+
+/* ─── SETTINGS SHEET ─── */
+.settings-section{margin-bottom:18px;}
+.settings-section h3{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.api-key-row{display:flex;gap:8px;}
+.api-key-row input{flex:1;}
+.btn-sm{background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  border-radius:9px;padding:8px 13px;cursor:pointer;font-size:.78rem;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;}
+.btn-sm:hover{color:var(--text);border-color:var(--text);}
+.key-status{font-size:.72rem;margin-top:6px;display:flex;align-items:center;gap:5px;}
+.key-status.ok{color:var(--accent);}
+.key-status.missing{color:var(--muted);}
+.providers-list{display:flex;flex-direction:column;gap:7px;}
+.provider-row{display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px;}
+.provider-row span{font-size:.83rem;}
+.toggle{width:38px;height:22px;border-radius:11px;background:var(--border);border:none;cursor:pointer;
+  position:relative;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;
+  border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle.on::after{transform:translateX(16px);}
+.add-provider-row{display:flex;gap:7px;margin-top:8px;}
+.hint{font-size:.72rem;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+/* ─── IMPORT SHEET ─── */
+.import-status{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:12px 14px;margin-bottom:14px;font-size:.8rem;line-height:1.55;color:var(--muted);}
+.import-status strong{color:var(--text);}
+.import-list{display:flex;flex-direction:column;gap:8px;max-height:45vh;overflow-y:auto;margin-bottom:14px;}
+.import-item{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:11px 13px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .15s;}
+.import-item.selected{border-color:var(--accent3);}
+.import-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);
+  background:var(--card);flex-shrink:0;margin-top:1px;display:grid;place-items:center;font-size:.7rem;transition:all .15s;}
+.import-item.selected .import-check{background:var(--accent3);border-color:var(--accent3);color:#fff;}
+.import-info{flex:1;min-width:0;}
+.import-provider{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;}
+.import-meta{font-size:.74rem;color:var(--muted);margin-top:3px;}
+.import-pct{font-size:.88rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.import-select-all{font-size:.75rem;color:var(--accent3);cursor:pointer;margin-bottom:10px;display:inline-block;}
+
+/* ─── AI DRAWER ─── */
+.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;
+  display:none;justify-content:flex-end;backdrop-filter:blur(3px);}
+.ai-overlay.open{display:flex;}
+.ai-drawer{width:100%;max-width:400px;background:var(--card);
+  border-left:1px solid var(--border);display:flex;flex-direction:column;animation:slideInRight .22s ease;}
+@media(max-width:420px){.ai-drawer{max-width:100%;}}
+.ai-header{padding:16px 18px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ai-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;
+  display:flex;align-items:center;gap:8px;}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--accent3);animation:blink 1.5s infinite;}
+.ai-disclaimer{margin:10px 18px 0;background:color-mix(in srgb,var(--warn) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--warn) 28%,transparent);border-radius:10px;
+  padding:9px 12px;font-size:.72rem;color:color-mix(in srgb,var(--warn) 85%,var(--text));line-height:1.5;flex-shrink:0;}
+.ai-messages{flex:1;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:9px;}
+.msg{max-width:90%;padding:9px 12px;border-radius:12px;font-size:.8rem;line-height:1.55;animation:fadeUp .2s ease;}
+.msg.user{align-self:flex-end;background:var(--accent3);color:#fff;border-radius:12px 12px 3px 12px;}
+.msg.ai{align-self:flex-start;background:var(--surface);border:1px solid var(--border);
+  color:var(--text);border-radius:12px 12px 12px 3px;}
+.msg.loading{color:var(--muted);font-style:italic;}
+.ai-input-row{padding:10px 18px 20px;display:flex;gap:7px;flex-shrink:0;}
+.ai-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:9px 12px;color:var(--text);font-size:.82rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+.ai-input:focus{border-color:var(--accent3);}
+.btn-send{background:var(--accent3);color:#fff;border:none;border-radius:11px;
+  padding:9px 14px;font-weight:700;cursor:pointer;font-size:.8rem;transition:opacity .15s;font-family:'DM Sans',sans-serif;}
+.btn-send:hover{opacity:.85;}
+.btn-send:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-row">
+    <div class="logo-icon">🏷️</div>
+    <h1>Ofertas <span>Hoy</span></h1>
+  </div>
+  <div class="header-actions">
+    <div class="date-pill" id="datePill">📅 <strong></strong></div>
+    <button class="btn-icon-header btn-ai-header" onclick="openAI()" title="Consultar a Claude">🤖</button>
+    <button class="btn-icon-header" onclick="openSettings()" title="Configuración">⚙️</button>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats" id="statsBar"></div>
+
+<!-- DAY BAR -->
+<div class="section-bar" id="dayBar">
+  <span class="bar-label">Día</span>
+</div>
+
+<!-- CAT FILTER -->
+<div class="cat-bar" id="catBar">
+  <span class="bar-label">Cat</span>
+</div>
+
+<!-- GRID -->
+<div class="grid" id="grid"></div>
+
+<!-- FAB -->
+<div class="fab-group">
+  <button class="fab fab-update" id="fabUpdate" onclick="startAutoUpdate()">
+    <span id="updateIcon">🔄</span> <span id="updateLabel">Actualizar ofertas</span>
+  </button>
+  <button class="fab fab-add" onclick="openOfferModal()">＋ Agregar</button>
+</div>
+
+<!-- ══════════════════════════════════
+     OFFER MODAL
+══════════════════════════════════ -->
+<div class="overlay" id="offerOverlay">
+  <div class="sheet">
+    <div class="sheet-inner">
+      <span class="sheet-handle"></span>
+      <h2 id="offerModalTitle">➕ Nueva Oferta</h2>
+      <div class="form-grid">
+        <div class="fg full"><label>Proveedor / Banco / App</label>
+          <input id="f-provider" type="text" placeholder="Ej: MODO, Naranja X, Galicia…"></div>
+        <div class="fg full"><label>Descripción</label>
+          <textarea id="f-desc" placeholder="Ej: Reintegro en supermercados aderidos todos los martes"></textarea></div>
+        <div class="fg"><label>Categoría</label>
+          <select id="f-cat">
+            <option>Supermercados</option><option>Combustible</option><option>Gastronomía</option>
+            <option>Farmacia</option><option>Indumentaria</option><option>Electrónica</option>
+            <option>Entretenimiento</option><option>Viajes</option>
+          </select></div>
+        <div class="fg"><label>Días vigentes</label>
+          <input id="f-days" type="text" placeholder="Ej: Lunes y Martes"></div>
+        <div class="fg"><label>% de reintegro</label>
+          <input id="f-pct" type="number" placeholder="Ej: 20" min="1" max="100"></div>
+        <div class="fg"><label>Tope máximo ($)</label>
+          <input id="f-cap" type="number" placeholder="Ej: 3000"></div>
+        <div class="fg"><label>Compra mínima ($)</label>
+          <input id="f-min" type="number" placeholder="Ej: 5000"></div>
+        <div class="fg"><label>Vencimiento</label>
+          <input id="f-exp" type="date"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="closeOfferModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveOffer()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SETTINGS SHEET
+══════════════════════════════════ -->
+<div class="overlay" id="settingsOverlay">
+  <div class="sheet">
+    <div class="sheet-inner">
+      <span class="sheet-handle"></span>
+      <h2>⚙️ Configuración</h2>
+
+      <div class="settings-section">
+        <h3>🔑 API Key de Anthropic</h3>
+        <div class="api-key-row">
+          <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-…">
+          <button class="btn-sm" onclick="saveApiKey()">Guardar</button>
+        </div>
+        <div class="key-status" id="keyStatus"></div>
+        <p class="hint">Necesaria para auto-actualizar fuera de Claude.ai. Obtené tu key en <strong>console.anthropic.com</strong>. Se guarda solo en tu dispositivo.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3>🏦 Proveedores a buscar</h3>
+        <div class="providers-list" id="providersList"></div>
+        <div class="add-provider-row">
+          <input id="newProviderInput" type="text" placeholder="Agregar proveedor…">
+          <button class="btn-sm" onclick="addProvider()">＋</button>
+        </div>
+        <p class="hint">Al auto-actualizar, Claude buscará promos de estos proveedores en la web.</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="closeSettings()">Listo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     IMPORT PREVIEW SHEET
+══════════════════════════════════ -->
+<div class="overlay" id="importOverlay">
+  <div class="sheet">
+    <div class="sheet-inner">
+      <span class="sheet-handle"></span>
+      <h2>📥 Importar Ofertas</h2>
+      <div class="import-status" id="importStatus"></div>
+      <span class="import-select-all" onclick="toggleSelectAll()">Seleccionar / Deseleccionar todas</span>
+      <div class="import-list" id="importList"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="closeImport()">Cancelar</button>
+        <button class="btn-primary purple" onclick="confirmImport()">Importar seleccionadas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     AI VERACIDAD DRAWER
+══════════════════════════════════ -->
+<div class="ai-overlay" id="aiOverlay">
+  <div class="ai-drawer">
+    <div class="ai-header">
+      <div class="ai-title"><span class="ai-dot"></span> Consultar a Claude</div>
+      <button class="btn-icon-header" onclick="closeAI()" style="width:30px;height:30px;">✕</button>
+    </div>
+    <div class="ai-disclaimer">
+      ⚠️ Los datos son <strong>ingresados manualmente</strong>. Claude analiza lo que cargaste pero no accede a fuentes bancarias en tiempo real.
+    </div>
+    <div class="ai-messages" id="aiMessages">
+      <div class="msg ai">Hola 👋 Puedo analizar las ofertas que cargaste, explicar sus limitaciones y ayudarte a verificarlas. ¿Qué querés saber?</div>
+    </div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="aiInput" type="text" placeholder="Preguntale algo a Claude…"
+        onkeydown="if(event.key==='Enter')sendAI()">
+      <button class="btn-send" id="sendBtn" onclick="sendAI()">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════ -->
+<script>
+// ─── CONFIG ───
+const CAT_CFG = {
+  'Supermercados':  {icon:'🛒',color:'#00e5a0'},
+  'Combustible':    {icon:'⛽',color:'#ff6b35'},
+  'Gastronomía':    {icon:'🍽️',color:'#f7c948'},
+  'Farmacia':       {icon:'💊',color:'#3ecfff'},
+  'Indumentaria':   {icon:'👗',color:'#e05fff'},
+  'Electrónica':    {icon:'💻',color:'#7c6af7'},
+  'Entretenimiento':{icon:'🎬',color:'#ff4d88'},
+  'Viajes':         {icon:'✈️',color:'#48d9a4'},
+};
+const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DIAS_S = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+const DEFAULT_OFFERS = [
+  {id:1,provider:'MODO',cat:'Supermercados',desc:'Reintegro en Coto, Día y La Anónima con cualquier billetera vinculada.',pct:30,cap:2500,minPurchase:3000,days:'Lunes y Martes',exp:'2026-06-30'},
+  {id:2,provider:'Naranja X',cat:'Gastronomía',desc:'Descuento en restaurantes y delivery aderidos. Válido para pagos con QR.',pct:20,cap:1500,minPurchase:2000,days:'Todos los días',exp:'2026-06-15'},
+  {id:3,provider:'YPF Serviclub',cat:'Combustible',desc:'Reintegro en combustibles YPF para tarjetas afiliadas al programa.',pct:15,cap:3000,minPurchase:0,days:'Miércoles',exp:'2026-07-31'},
+  {id:4,provider:'Galicia Move',cat:'Farmacia',desc:'Descuento en farmacias aderidas con tarjeta de crédito Galicia.',pct:25,cap:2000,minPurchase:1500,days:'Jueves y Viernes',exp:'2026-06-30'},
+  {id:5,provider:'Mercado Pago',cat:'Supermercados',desc:'Cashback en Carrefour y COTO con Cuenta de Pago.',pct:20,cap:4000,minPurchase:5000,days:'Martes',exp:'2026-06-20'},
+  {id:6,provider:'Banco Nación',cat:'Indumentaria',desc:'Reintegro en comercios de ropa y calzado afiliados.',pct:12,cap:1800,minPurchase:3000,days:'Sábados',exp:'2026-07-15'},
+  {id:7,provider:'Personal Pay',cat:'Entretenimiento',desc:'Descuento en plataformas de streaming y cines aderidos.',pct:30,cap:800,minPurchase:0,days:'Todos los días',exp:'2026-06-10'},
+  {id:8,provider:'Despegar',cat:'Viajes',desc:'Reintegro en vuelos y paquetes con tarjetas Visa adheridas.',pct:10,cap:15000,minPurchase:20000,days:'Fin de semana',exp:'2026-08-31'},
+];
+const DEFAULT_PROVIDERS = ['MODO','Naranja X','Mercado Pago','Galicia','Santander','BBVA','Banco Nación','Personal Pay','YPF Serviclub','Despegar'];
+
+// ─── STATE ───
+let offers     = JSON.parse(localStorage.getItem('ofertas-data') || 'null') || DEFAULT_OFFERS;
+let providers  = JSON.parse(localStorage.getItem('ofertas-providers') || 'null') || DEFAULT_PROVIDERS;
+let provToggle = JSON.parse(localStorage.getItem('ofertas-provtoggle') || '{}');
+let nextId     = Math.max(...offers.map(o=>o.id), 0) + 1;
+let activeCat  = 'Todas';
+let activeDay  = 'Todos';
+let editingId  = null;
+let pendingImports = [];
+let allSelected = true;
+
+// ─── PERSIST ───
+function persist() {
+  localStorage.setItem('ofertas-data', JSON.stringify(offers));
+  localStorage.setItem('ofertas-providers', JSON.stringify(providers));
+  localStorage.setItem('ofertas-provtoggle', JSON.stringify(provToggle));
+}
+
+// ─── API KEY ───
+function getApiKey() { return localStorage.getItem('ofertas-apikey') || ''; }
+function saveApiKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if(k) localStorage.setItem('ofertas-apikey', k);
+  else localStorage.removeItem('ofertas-apikey');
+  renderKeyStatus();
+}
+function renderKeyStatus() {
+  const k = getApiKey();
+  const el = document.getElementById('keyStatus');
+  el.className = 'key-status ' + (k ? 'ok' : 'missing');
+  el.textContent = k ? '✓ API Key configurada' : 'Sin key — funciona en Claude.ai, necesitás key para GitHub Pages';
+}
+
+// ─── DATE ───
+function initDate() {
+  const d = new Date();
+  const str = d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('datePill').innerHTML = `📅 <strong>${str.charAt(0).toUpperCase()+str.slice(1)}</strong>`;
+  activeDay = DIAS[d.getDay()];
+}
+
+// ─── DAY MATCH ───
+function matchDay(offer, day) {
+  if(day === 'Todos') return true;
+  const d = offer.days.toLowerCase();
+  if(/todos los d[ií]as|siempre|diario/i.test(d)) return true;
+  if((day==='Sábado'||day==='Domingo') && /fin de semana|finde/i.test(d)) return true;
+  return d.includes(day.toLowerCase()) || d.includes(day.slice(0,3).toLowerCase());
+}
+
+// ─── STATS ───
+function renderStats() {
+  const vis = getFiltered();
+  const maxPct = vis.length ? Math.max(...vis.map(o=>o.pct)) : 0;
+  const totalCap = vis.reduce((s,o)=>s+o.cap,0);
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><span class="stat-icon">🏷️</span><div>
+      <div class="stat-num">${vis.length}</div>
+      <div class="stat-label">${activeDay==='Todos'?'Total ofertas':'Ofertas '+activeDay}</div></div></div>
+    <div class="stat-card"><span class="stat-icon">🔥</span><div>
+      <div class="stat-num">${maxPct}%</div><div class="stat-label">Mejor reintegro</div></div></div>
+    <div class="stat-card"><span class="stat-icon">💰</span><div>
+      <div class="stat-num">$${totalCap.toLocaleString('es-AR')}</div><div class="stat-label">Tope acumulado</div></div></div>`;
+}
+
+// ─── DAY BAR ───
+function renderDayBar() {
+  const today = DIAS[new Date().getDay()];
+  const bar = document.getElementById('dayBar');
+  bar.innerHTML = `<span class="bar-label">Día</span>`
+    + ['Todos',...DIAS].map((d,i)=>{
+      const isToday = d === today;
+      const label = d==='Todos' ? 'Todos' : DIAS_S[i-1];
+      const suffix = isToday && d!=='Todos' ? ' ✦' : '';
+      return `<div class="day-chip${activeDay===d?' active':''}${isToday&&activeDay!==d?' today-hl':''}" data-d="${d}">${label}${suffix}</div>`;
+    }).join('');
+  bar.querySelectorAll('.day-chip').forEach(c=>c.onclick=()=>{activeDay=c.dataset.d;render();});
+}
+
+// ─── CAT BAR ───
+function renderCatBar() {
+  const cats = [...new Set(offers.map(o=>o.cat))].sort();
+  const bar = document.getElementById('catBar');
+  bar.innerHTML = `<span class="bar-label">Cat</span>`
+    + `<div class="chip${activeCat==='Todas'?' active':''}" data-cat="Todas">Todas</div>`
+    + cats.map(c=>`<div class="chip${activeCat===c?' active':''}" data-cat="${c}">${CAT_CFG[c]?.icon||''} ${c}</div>`).join('');
+  bar.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{activeCat=c.dataset.cat;render();});
+}
+
+// ─── FILTER ───
+function getFiltered() {
+  return offers
+    .filter(o => activeCat==='Todas' || o.cat===activeCat)
+    .filter(o => matchDay(o, activeDay));
+}
+
+// ─── VALIDITY ───
+function validity(expStr) {
+  const t=new Date(); t.setHours(0,0,0,0);
+  const e=new Date(expStr); e.setHours(0,0,0,0);
+  const d=Math.round((e-t)/864e5);
+  if(d<0)  return {lbl:'Vencida',cls:'expired'};
+  if(d===0) return {lbl:'Vence hoy',cls:'soon'};
+  if(d<=3)  return {lbl:`Vence en ${d}d`,cls:'soon'};
+  return {lbl:`Hasta ${e.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}`,cls:''};
+}
+
+// ─── CARD ───
+function cardHTML(o) {
+  const cfg = CAT_CFG[o.cat]||{icon:'🏷️',color:'#00e5a0'};
+  const v = validity(o.exp);
+  const isToday = matchDay(o, DIAS[new Date().getDay()]);
+  return `<div class="offer-card" style="--cc:${cfg.color}">
+    <div class="card-top">
+      <div class="cat-pill">${cfg.icon} ${o.cat}</div>
+      <div class="card-actions">
+        <button class="btn-card ai-ask" onclick="askCard(${o.id})" title="Consultar">🤖</button>
+        <button class="btn-card" onclick="editOffer(${o.id})" title="Editar">✏️</button>
+        <button class="btn-card del" onclick="delOffer(${o.id})" title="Eliminar">🗑️</button>
+      </div>
+    </div>
+    <div class="card-provider">${o.provider}</div>
+    <div class="card-desc">${o.desc}</div>
+    <div class="card-metrics">
+      <div class="metric"><div class="metric-val">${o.pct}%</div><div class="metric-lbl">Reintegro</div></div>
+      <div class="metric"><div class="metric-val">$${o.cap.toLocaleString('es-AR')}</div><div class="metric-lbl">Tope</div></div>
+      <div class="metric"><div class="metric-val sm">${o.minPurchase>0?'$'+o.minPurchase.toLocaleString('es-AR'):'Sin mín.'}</div><div class="metric-lbl">Mínimo</div></div>
+    </div>
+    <div class="card-footer">
+      <div class="validity ${v.cls}"><span class="dot"></span>${v.lbl}</div>
+      <div class="card-tags">
+        ${isToday?'<span class="today-badge">✦ Hoy</span>':''}
+        <span class="tag">📅 ${o.days}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── RENDER ───
+function render() {
+  renderDayBar(); renderCatBar(); renderStats();
+  const filtered = getFiltered();
+  document.getElementById('grid').innerHTML = filtered.length
+    ? filtered.map(cardHTML).join('')
+    : `<div class="empty"><div class="empty-icon">🔍</div><p>Sin ofertas para este filtro.<br>Probá otro día o categoría.</p></div>`;
+}
+
+// ─── OFFER MODAL ───
+function openOfferModal(prefill=null) {
+  editingId = prefill?.id || null;
+  document.getElementById('offerModalTitle').textContent = prefill ? '✏️ Editar Oferta' : '➕ Nueva Oferta';
+  document.getElementById('f-provider').value = prefill?.provider||'';
+  document.getElementById('f-desc').value     = prefill?.desc||'';
+  document.getElementById('f-cat').value      = prefill?.cat||'Supermercados';
+  document.getElementById('f-days').value     = prefill?.days||'';
+  document.getElementById('f-pct').value      = prefill?.pct||'';
+  document.getElementById('f-cap').value      = prefill?.cap||'';
+  document.getElementById('f-min').value      = prefill?.minPurchase||'';
+  document.getElementById('f-exp').value      = prefill?.exp||'';
+  document.getElementById('offerOverlay').classList.add('open');
+}
+function closeOfferModal() { document.getElementById('offerOverlay').classList.remove('open'); }
+function editOffer(id) { openOfferModal(offers.find(o=>o.id===id)); }
+function delOffer(id) {
+  if(!confirm('¿Eliminar esta oferta?')) return;
+  offers = offers.filter(o=>o.id!==id); persist(); render();
+}
+function saveOffer() {
+  const provider = document.getElementById('f-provider').value.trim();
+  const pct = parseInt(document.getElementById('f-pct').value);
+  const cap = parseInt(document.getElementById('f-cap').value);
+  if(!provider||!pct||!cap){alert('Completá Proveedor, % y Tope.');return;}
+  const o = {
+    id: editingId || nextId++, provider,
+    cat: document.getElementById('f-cat').value,
+    desc: document.getElementById('f-desc').value.trim(),
+    pct, cap,
+    minPurchase: parseInt(document.getElementById('f-min').value)||0,
+    days: document.getElementById('f-days').value.trim()||'Consultar',
+    exp: document.getElementById('f-exp').value||'2099-12-31',
+  };
+  if(editingId) { const i=offers.findIndex(x=>x.id===editingId); if(i>-1)offers[i]=o; }
+  else offers.push(o);
+  persist(); closeOfferModal(); render();
+}
+document.getElementById('offerOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeOfferModal();});
+
+// ─── SETTINGS ───
+function openSettings() {
+  renderKeyStatus();
+  document.getElementById('apiKeyInput').value = getApiKey() ? '••••••••' : '';
+  renderProvidersList();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+document.getElementById('settingsOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSettings();});
+
+function renderProvidersList() {
+  document.getElementById('providersList').innerHTML = providers.map((p,i)=>`
+    <div class="provider-row">
+      <span>${p}</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="toggle${provToggle[p]!==false?' on':''}" onclick="toggleProvider('${p}')"></button>
+        <button class="btn-sm" onclick="removeProvider(${i})" style="padding:4px 8px;">✕</button>
+      </div>
+    </div>`).join('');
+}
+function toggleProvider(p) {
+  provToggle[p] = provToggle[p]===false ? true : false;
+  persist(); renderProvidersList();
+}
+function removeProvider(i) {
+  providers.splice(i,1); persist(); renderProvidersList();
+}
+function addProvider() {
+  const v = document.getElementById('newProviderInput').value.trim();
+  if(!v||providers.includes(v)) return;
+  providers.push(v); persist();
+  document.getElementById('newProviderInput').value='';
+  renderProvidersList();
+}
+
+// ─── AUTO UPDATE ───
+async function startAutoUpdate() {
+  const fab = document.getElementById('fabUpdate');
+  const icon = document.getElementById('updateIcon');
+  const label = document.getElementById('updateLabel');
+  fab.disabled = true;
+  icon.classList.add('spin'); icon.textContent='⟳';
+  label.textContent='Buscando…';
+
+  const activeProviders = providers.filter(p=>provToggle[p]!==false);
+  const today = new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const prompt = `Hoy es ${today}. Buscá en la web las promociones y descuentos vigentes de los siguientes bancos y billeteras en Argentina: ${activeProviders.join(', ')}.
+
+Devolvé ÚNICAMENTE un array JSON válido, sin texto previo ni posterior, sin bloques de código markdown, con objetos que tengan EXACTAMENTE estas propiedades:
+- "provider": nombre del banco/billetera (string)
+- "cat": categoría exacta, una de: Supermercados, Combustible, Gastronomía, Farmacia, Indumentaria, Electrónica, Entretenimiento, Viajes (string)
+- "desc": descripción corta de la promoción (string, máx 100 chars)
+- "pct": porcentaje de reintegro o descuento (número entero)
+- "cap": tope máximo de reintegro en pesos argentinos (número entero, 0 si no hay tope claro)
+- "minPurchase": compra mínima en pesos argentinos (número entero, 0 si no hay mínimo)
+- "days": días que aplica la promo, en español (string, ej: "Martes", "Lunes y Miércoles", "Todos los días")
+- "exp": fecha estimada de vencimiento en formato YYYY-MM-DD
+
+Solo incluí promos con datos concretos encontrados. Si no encontrás info de un proveedor, no lo incluyas. Buscá al menos 2-3 promos vigentes de cada proveedor si existen.`;
+
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'anthropic-version': '2023-06-01',
+    };
+    const key = getApiKey();
+    if(key) {
+      headers['x-api-key'] = key;
+      headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    }
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+
+    // Extract text from response (may contain tool_use, tool_result, text blocks)
+    const text = (data.content||[])
+      .filter(b=>b.type==='text')
+      .map(b=>b.text).join('');
+
+    // Parse JSON — strip any markdown fences if present
+    const clean = text.replace(/```json|```/gi,'').trim();
+    const start = clean.indexOf('[');
+    const end = clean.lastIndexOf(']');
+    if(start===-1||end===-1) throw new Error('No se encontró JSON en la respuesta');
+
+    const parsed = JSON.parse(clean.slice(start, end+1));
+    if(!Array.isArray(parsed)||!parsed.length) throw new Error('Respuesta vacía o inválida');
+
+    pendingImports = parsed;
+    showImportPreview(parsed);
+  } catch(err) {
+    alert('Error al buscar ofertas:\n' + err.message + '\n\nVerificá tu API Key en ⚙️ Configuración.');
+  } finally {
+    fab.disabled = false;
+    icon.classList.remove('spin'); icon.textContent='🔄';
+    label.textContent='Actualizar ofertas';
+  }
+}
+
+// ─── IMPORT PREVIEW ───
+function showImportPreview(items) {
+  document.getElementById('importStatus').innerHTML =
+    `Se encontraron <strong>${items.length} ofertas</strong>. Revisalas y elegí cuáles importar:`;
+  allSelected = true;
+  document.getElementById('importList').innerHTML = items.map((o,i)=>{
+    const cfg = CAT_CFG[o.cat]||{icon:'🏷️',color:'#00e5a0'};
+    return `<div class="import-item selected" id="imp-${i}" onclick="toggleImportItem(${i})">
+      <div class="import-check" id="chk-${i}">✓</div>
+      <div class="import-info">
+        <div class="import-provider">${o.provider}</div>
+        <div class="import-meta">${cfg.icon} ${o.cat} · ${o.days} · Tope: $${(o.cap||0).toLocaleString('es-AR')}</div>
+        <div class="import-meta" style="margin-top:3px;font-size:.72rem;">${o.desc}</div>
+      </div>
+      <div class="import-pct">${o.pct}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('importOverlay').classList.add('open');
+}
+function toggleImportItem(i) {
+  const item = document.getElementById(`imp-${i}`);
+  const chk  = document.getElementById(`chk-${i}`);
+  item.classList.toggle('selected');
+  chk.textContent = item.classList.contains('selected') ? '✓' : '';
+}
+function toggleSelectAll() {
+  allSelected = !allSelected;
+  pendingImports.forEach((_,i)=>{
+    const item = document.getElementById(`imp-${i}`);
+    const chk  = document.getElementById(`chk-${i}`);
+    if(allSelected){item.classList.add('selected');chk.textContent='✓';}
+    else{item.classList.remove('selected');chk.textContent='';}
+  });
+}
+function confirmImport() {
+  const selected = pendingImports.filter((_,i)=>document.getElementById(`imp-${i}`)?.classList.contains('selected'));
+  if(!selected.length){alert('No seleccionaste ninguna oferta.');return;}
+  selected.forEach(o=>{
+    const exists = offers.find(x=>x.provider===o.provider&&x.cat===o.cat);
+    if(exists) {
+      Object.assign(exists,{...o,id:exists.id}); // update existing
+    } else {
+      offers.push({...o,id:nextId++});
+    }
+  });
+  persist(); closeImport(); render();
+  alert(`✓ ${selected.length} oferta(s) importadas correctamente.`);
+}
+function closeImport() { document.getElementById('importOverlay').classList.remove('open'); }
+document.getElementById('importOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeImport();});
+
+// ─── AI DRAWER ───
+let aiHistory = [];
+function openAI() { document.getElementById('aiOverlay').classList.add('open'); }
+function closeAI() { document.getElementById('aiOverlay').classList.remove('open'); }
+document.getElementById('aiOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAI();});
+
+function addMsg(role,text,loading=false) {
+  const d = document.createElement('div');
+  d.className = `msg ${role}${loading?' loading':''}`;
+  d.textContent = text;
+  const c = document.getElementById('aiMessages');
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+  return d;
+}
+
+async function sendAI() {
+  const inp = document.getElementById('aiInput');
+  const q = inp.value.trim(); if(!q) return;
+  inp.value='';
+  addMsg('user',q);
+  const loading = addMsg('ai','Claude está analizando…',true);
+  document.getElementById('sendBtn').disabled=true;
+  aiHistory.push({role:'user',content:q});
+
+  const sys = `Sos un asistente honesto que analiza una app personal de ofertas/descuentos bancarios en Argentina.
+DATOS CARGADOS:\n${offers.map(o=>`- ${o.provider} | ${o.cat} | ${o.pct}% | Tope $${o.cap} | Días: ${o.days} | Vence: ${o.exp}`).join('\n')}
+FECHA HOY: ${new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+Respondé en español argentino, sé honesto sobre las limitaciones (los datos son manuales), conciso y útil.`;
+
+  try {
+    const headers={'Content-Type':'application/json','anthropic-version':'2023-06-01'};
+    const key=getApiKey();
+    if(key){headers['x-api-key']=key;headers['anthropic-dangerous-direct-browser-access']='true';}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers,
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sys,messages:aiHistory})
+    });
+    const data=await res.json();
+    const reply=data.content?.find(b=>b.type==='text')?.text||'No pude responder.';
+    loading.textContent=reply; loading.classList.remove('loading');
+    aiHistory.push({role:'assistant',content:reply});
+  } catch(e){
+    loading.textContent='Error de conexión. Verificá tu API Key.'; loading.classList.remove('loading');
+    aiHistory.pop();
+  }
+  document.getElementById('sendBtn').disabled=false;
+}
+
+function askCard(id) {
+  const o=offers.find(x=>x.id===id); if(!o) return;
+  openAI();
+  setTimeout(()=>{
+    document.getElementById('aiInput').value=`Analizá la oferta de "${o.provider}" en ${o.cat}: ${o.pct}% con tope $${o.cap}. ¿Es realista? ¿Cómo la verifico?`;
+    sendAI();
+  },150);
+}
+
+// ─── INIT ───
+initDate();
+render();
+</script>
+</body>
+</html>
