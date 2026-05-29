@@ -348,13 +348,13 @@ textarea{resize:vertical;min-height:65px;}
       <h2>⚙️ Configuración</h2>
 
       <div class="settings-section">
-        <h3>🔑 API Key de Anthropic</h3>
+        <h3>🔑 API Key de Google Gemini</h3>
         <div class="api-key-row">
-          <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-…">
+          <input id="apiKeyInput" type="password" placeholder="AIza…">
           <button class="btn-sm" onclick="saveApiKey()">Guardar</button>
         </div>
         <div class="key-status" id="keyStatus"></div>
-        <p class="hint">Necesaria para auto-actualizar fuera de Claude.ai. Obtené tu key en <strong>console.anthropic.com</strong>. Se guarda solo en tu dispositivo.</p>
+        <p class="hint">🆓 <strong>¡Es gratis!</strong> Obtené tu key en <strong>aistudio.google.com</strong> → "Get API Key" → "Create API key". Se guarda solo en tu dispositivo.</p>
       </div>
 
       <div class="settings-section">
@@ -364,7 +364,7 @@ textarea{resize:vertical;min-height:65px;}
           <input id="newProviderInput" type="text" placeholder="Agregar proveedor…">
           <button class="btn-sm" onclick="addProvider()">＋</button>
         </div>
-        <p class="hint">Al auto-actualizar, Claude buscará promos de estos proveedores en la web.</p>
+        <p class="hint">Al auto-actualizar, Gemini buscará promos de estos proveedores en la web.</p>
       </div>
 
       <div class="btn-row">
@@ -406,7 +406,7 @@ textarea{resize:vertical;min-height:65px;}
       ⚠️ Los datos son <strong>ingresados manualmente</strong>. Claude analiza lo que cargaste pero no accede a fuentes bancarias en tiempo real.
     </div>
     <div class="ai-messages" id="aiMessages">
-      <div class="msg ai">Hola 👋 Puedo analizar las ofertas que cargaste, explicar sus limitaciones y ayudarte a verificarlas. ¿Qué querés saber?</div>
+      <div class="msg ai">Hola 👋 Soy Gemini. Puedo analizar las ofertas que cargaste, explicar sus limitaciones y ayudarte a verificarlas. ¿Qué querés saber?</div>
     </div>
     <div class="ai-input-row">
       <input class="ai-input" id="aiInput" type="text" placeholder="Preguntale algo a Claude…"
@@ -476,7 +476,7 @@ function renderKeyStatus() {
   const k = getApiKey();
   const el = document.getElementById('keyStatus');
   el.className = 'key-status ' + (k ? 'ok' : 'missing');
-  el.textContent = k ? '✓ API Key configurada' : 'Sin key — funciona en Claude.ai, necesitás key para GitHub Pages';
+  el.textContent = k ? '✓ Gemini API Key configurada' : 'Sin key — configurá tu key gratuita de aistudio.google.com';
 }
 
 // ─── DATE ───
@@ -668,8 +668,11 @@ function addProvider() {
   renderProvidersList();
 }
 
-// ─── AUTO UPDATE ───
+// ─── AUTO UPDATE (Gemini) ───
 async function startAutoUpdate() {
+  const key = getApiKey();
+  if(!key) { openSettings(); alert('Primero configurá tu Gemini API Key en ⚙️ Configuración.\n\n¡Es gratis en aistudio.google.com!'); return; }
+
   const fab = document.getElementById('fabUpdate');
   const icon = document.getElementById('updateIcon');
   const label = document.getElementById('updateLabel');
@@ -692,48 +695,37 @@ Devolvé ÚNICAMENTE un array JSON válido, sin texto previo ni posterior, sin b
 - "days": días que aplica la promo, en español (string, ej: "Martes", "Lunes y Miércoles", "Todos los días")
 - "exp": fecha estimada de vencimiento en formato YYYY-MM-DD
 
-Solo incluí promos con datos concretos encontrados. Si no encontrás info de un proveedor, no lo incluyas. Buscá al menos 2-3 promos vigentes de cada proveedor si existen.`;
+Solo incluí promos con datos concretos encontrados. Si no encontrás info de un proveedor, no lo incluyas.`;
 
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-    };
-    const key = getApiKey();
-    if(key) {
-      headers['x-api-key'] = key;
-      headers['anthropic-dangerous-direct-browser-access'] = 'true';
-    }
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers,
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 3000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:prompt}]
-      })
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search: {} }],
+          generationConfig: { temperature: 0.2 }
+        })
+      }
+    );
     const data = await res.json();
     if(data.error) throw new Error(data.error.message);
 
-    // Extract text from response (may contain tool_use, tool_result, text blocks)
-    const text = (data.content||[])
-      .filter(b=>b.type==='text')
-      .map(b=>b.text).join('');
-
-    // Parse JSON — strip any markdown fences if present
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const clean = text.replace(/```json|```/gi,'').trim();
     const start = clean.indexOf('[');
     const end = clean.lastIndexOf(']');
-    if(start===-1||end===-1) throw new Error('No se encontró JSON en la respuesta');
+    if(start===-1||end===-1) throw new Error('No se encontró JSON. Intentá de nuevo.');
 
     const parsed = JSON.parse(clean.slice(start, end+1));
-    if(!Array.isArray(parsed)||!parsed.length) throw new Error('Respuesta vacía o inválida');
+    if(!Array.isArray(parsed)||!parsed.length) throw new Error('Respuesta vacía o inválida.');
 
     pendingImports = parsed;
     showImportPreview(parsed);
   } catch(err) {
-    alert('Error al buscar ofertas:\n' + err.message + '\n\nVerificá tu API Key en ⚙️ Configuración.');
+    alert('Error al buscar ofertas:\n' + err.message + '\n\nVerificá tu Gemini API Key en ⚙️ Configuración.');
   } finally {
     fab.disabled = false;
     icon.classList.remove('spin'); icon.textContent='🔄';
@@ -810,11 +802,13 @@ function addMsg(role,text,loading=false) {
 async function sendAI() {
   const inp = document.getElementById('aiInput');
   const q = inp.value.trim(); if(!q) return;
+  const key = getApiKey();
+  if(!key) { alert('Configurá tu Gemini API Key en ⚙️ para usar el chat.'); openSettings(); return; }
   inp.value='';
   addMsg('user',q);
-  const loading = addMsg('ai','Claude está analizando…',true);
+  const loading = addMsg('ai','Gemini está analizando…',true);
   document.getElementById('sendBtn').disabled=true;
-  aiHistory.push({role:'user',content:q});
+  aiHistory.push({role:'user', parts:[{text:q}]});
 
   const sys = `Sos un asistente honesto que analiza una app personal de ofertas/descuentos bancarios en Argentina.
 DATOS CARGADOS:\n${offers.map(o=>`- ${o.provider} | ${o.cat} | ${o.pct}% | Tope $${o.cap} | Días: ${o.days} | Vence: ${o.exp}`).join('\n')}
@@ -822,19 +816,25 @@ FECHA HOY: ${new Date().toLocaleDateString('es-AR',{weekday:'long',year:'numeric
 Respondé en español argentino, sé honesto sobre las limitaciones (los datos son manuales), conciso y útil.`;
 
   try {
-    const headers={'Content-Type':'application/json','anthropic-version':'2023-06-01'};
-    const key=getApiKey();
-    if(key){headers['x-api-key']=key;headers['anthropic-dangerous-direct-browser-access']='true';}
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers,
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sys,messages:aiHistory})
-    });
-    const data=await res.json();
-    const reply=data.content?.find(b=>b.type==='text')?.text||'No pude responder.';
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          system_instruction:{ parts:[{text:sys}] },
+          contents: aiHistory,
+          generationConfig:{ temperature:0.4, maxOutputTokens:800 }
+        })
+      }
+    );
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude responder.';
     loading.textContent=reply; loading.classList.remove('loading');
-    aiHistory.push({role:'assistant',content:reply});
+    aiHistory.push({role:'model', parts:[{text:reply}]});
   } catch(e){
-    loading.textContent='Error de conexión. Verificá tu API Key.'; loading.classList.remove('loading');
+    loading.textContent='Error: ' + e.message; loading.classList.remove('loading');
     aiHistory.pop();
   }
   document.getElementById('sendBtn').disabled=false;
